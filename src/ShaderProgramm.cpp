@@ -36,7 +36,27 @@ bool ShaderProgramm::linkProgram(GLuint vs, GLuint fs, std::string &outError) {
     return true;
 }
 
-bool ShaderProgramm::createFromSources(const char* vertexSrc, const char* fragmentSrc, std::string &outError) {
+bool ShaderProgramm::createFromSources(std::string &outError) {
+    const char* vertexSrc = R"glsl(
+        #version 330 core
+        layout (location=0) in vec3 aPos;
+        layout (location=1) in vec3 aColor;
+        out vec3 vColor;
+        uniform mat4 uMVP;
+        void main() {
+            vColor = aColor;
+            gl_Position = uMVP * vec4(aPos, 1.0);
+        }
+    )glsl";
+
+    const char* fragmentSrc = R"glsl(
+        #version 330 core
+        in vec3 vColor;
+        out vec4 FragColor;
+        void main() {
+            FragColor = vec4(vColor, 1.0);
+        }
+    )glsl";
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertexSrc, nullptr);
     glCompileShader(vs);

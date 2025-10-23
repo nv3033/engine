@@ -12,7 +12,9 @@ src/Cube.h
 src/Cube.cpp 
 src/ShaderProgramm.h
 src/ShaderProgramm.cpp
-src/HierarchyWindow.h)
+src/HierarchyWindow.h
+src/Window.h
+src/Window.cpp)
 
 set(GLM_DIR "${LIB_DIR}/glm")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}")

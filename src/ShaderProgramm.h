@@ -7,7 +7,7 @@ public:
     ShaderProgramm() : ID(0) {}
     ~ShaderProgramm();
 
-    bool createFromSources(const char* vertexSrc, const char* fragmentSrc, std::string &outError);
+    bool createFromSources(std::string &outError);
     void use() const;
     GLuint id() const { return ID; }
 
