@@ -6,7 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-add_executable(${PROJECT_NAME} src/main.cpp src/Cube.h src/Cube.cpp src/HierarchyWindow.h)
+add_executable(${PROJECT_NAME} 
+src/main.cpp 
+src/Cube.h 
+src/Cube.cpp 
+src/ShaderProgramm.h
+src/ShaderProgramm.cpp
+src/HierarchyWindow.h)
 
 set(GLM_DIR "${LIB_DIR}/glm")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}")
