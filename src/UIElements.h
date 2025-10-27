@@ -36,5 +36,6 @@ public:
 
     std::vector<GameObject> get_objects();
     void set_objects(std::vector<GameObject> objects);
+    GameObject* find_object_by_id(int id);
 };
 

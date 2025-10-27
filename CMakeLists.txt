@@ -8,8 +8,8 @@ set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_executable(${PROJECT_NAME} 
 src/main.cpp 
-src/Cube.h 
-src/Cube.cpp 
+src/Basic_Objects.h 
+src/Basic_Objects.cpp
 src/ShaderProgramm.h
 src/ShaderProgramm.cpp
 src/HierarchyWindow.h

@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ShaderProgramm.h"
-#include "Cube.h"
+#include "Basic_Objects.h"
 #include "Window.h"
 #include "UIElements.h"
 
@@ -66,7 +66,10 @@ int main() {
 
         for (int i = 0; i < ui_elements.get_objects().size(); i ++){
             if (ui_elements.get_objects()[i].type == "cube"){
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(
+                    ui_elements.get_objects()[i].coords[0],
+                    ui_elements.get_objects()[i].coords[1], 
+                    ui_elements.get_objects()[i].coords[2]));
                 //model = glm::rotate(model, t * 1.2f, glm::vec3(0.0f, 1.0f, 0.0f));
                 //model = glm::rotate(model, t * 0.6f, glm::vec3(1.0f, 0.0f, 0.0f));
                 glm::mat4 mvp = proj * view * model;
@@ -99,5 +102,6 @@ int main() {
     }
     ui_elements.~UIElements();
     window.~Window();
+    cube.~Cube();
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "UIElements.h"
 
-const char* availableTypes[] = { "cube" }; 
+const char* availableTypes[] = { "cube", "wall" }; 
 char name_input_text[] = {};
 
 
@@ -72,7 +72,7 @@ void UIElements::list_update(){
             }
             newObject.ID = new_id;
             newObject.type = availableTypes[selectedType];
-            newObject.name = "cube_" + std::to_string(gameObjects.size());  // Simple name generation
+            newObject.name = "cube_" + std::to_string(new_id);  // Simple name generation
 
             gameObjects.push_back(newObject);
             showAddObjectPopup = false;
@@ -109,13 +109,43 @@ static char nameBuffer[256] = ""; // Static buffer for name input
 void UIElements::prefs_update(){
     ImGui::Begin("Object Prefs");
     if (showPrefs){
-        ImGui::Text("name: ");
-        ImGui::SameLine();
-        ImGui::InputText("Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+        ImGui::Text("Current Object: %s", selectedObject.name.c_str());
+        ImGui::InputText("New Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+
+
+        if(ImGui::Button("change name", ImVec2(120, 0))){
+            std::string new_name = nameBuffer;
+            bool name_found = false;
+            for (int i = 0; i < gameObjects.size(); i ++){
+                if (gameObjects[i].name == new_name){
+                    name_found = true;
+                }
+            }
+            if (!name_found){
+                selectedObject.name = new_name;
+                find_object_by_id(selectedObject.ID)->name = selectedObject.name;
+            }
+            else{
+                ImGui::OpenPopup("Name Exists");
+            }
+        }
+        if (ImGui::BeginPopupModal("Name Exists", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Name already exists!");
+            if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();
+
+            }
+            ImGui::EndPopup();
+        }
+
 
         ImGui::InputFloat("X", &selectedObject.coords[0]);
         ImGui::InputFloat("Y", &selectedObject.coords[1]);
         ImGui::InputFloat("Z", &selectedObject.coords[2]);
+
+        find_object_by_id(selectedObject.ID)->coords[0] = selectedObject.coords[0];
+        find_object_by_id(selectedObject.ID)->coords[1] = selectedObject.coords[1];
+        find_object_by_id(selectedObject.ID)->coords[2] = selectedObject.coords[2];
 
         ImGui::Separator();
 
@@ -141,4 +171,12 @@ std::vector<GameObject> UIElements::get_objects(){
 
 void UIElements::set_objects(std::vector<GameObject> objects){
     gameObjects = objects;
+}
+
+GameObject* UIElements::find_object_by_id(int id){
+    for(int i = 0; i < gameObjects.size(); i ++){
+        if (selectedObject.ID == gameObjects[i].ID){
+            return &gameObjects[i];
+        }
+    }
 }
