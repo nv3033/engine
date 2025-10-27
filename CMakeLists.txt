@@ -7,16 +7,17 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_executable(${PROJECT_NAME} 
-src/main.cpp 
-src/Basic_Objects.h 
-src/Basic_Objects.cpp
-src/ShaderProgramm.h
-src/ShaderProgramm.cpp
-src/HierarchyWindow.h
-src/Window.h
-src/Window.cpp
-src/UIElements.h
-src/UIElements.cpp)
+    src/main.cpp 
+    src/Basic_Objects.h 
+    src/Basic_Objects.cpp
+    src/ShaderProgramm.h
+    src/ShaderProgramm.cpp
+    src/HierarchyWindow.h
+    src/Window.h
+    src/Window.cpp
+    src/UIElements.h
+    src/UIElements.cpp
+)
 
 set(GLM_DIR "${LIB_DIR}/glm")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}")
@@ -48,6 +49,10 @@ add_library(imgui STATIC
 )
 target_include_directories(imgui PUBLIC "${IMGUI_DIR}")
 target_link_libraries(${PROJECT_NAME} imgui)
+
+# STB_IMAGE
+set(STB_DIR "${LIB_DIR}/stb_image")
+target_include_directories(${PROJECT_NAME} PUBLIC "${STB_DIR}") # Add include directory for stb_image.h
 
 if (APPLE)
     message(STATUS "Platform is Apple")
