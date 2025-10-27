@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(opengltriangle)
+project(engine)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -14,7 +14,9 @@ src/ShaderProgramm.h
 src/ShaderProgramm.cpp
 src/HierarchyWindow.h
 src/Window.h
-src/Window.cpp)
+src/Window.cpp
+src/UIElements.h
+src/UIElements.cpp)
 
 set(GLM_DIR "${LIB_DIR}/glm")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}")
