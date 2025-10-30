@@ -148,14 +148,16 @@ void UIElements::prefs_update(int textures_count){
         find_object_by_id(selectedObject.ID)->coords[2] = selectedObject.coords[2];
 
         ImGui::Separator();
+        
+        if(selectedObject.type == "wall"){
+            ImGui::InputFloat("rotX", &selectedObject.rotation[0]);
+            ImGui::InputFloat("rotY", &selectedObject.rotation[1]);
+            ImGui::InputFloat("rotZ", &selectedObject.rotation[2]);
 
-        ImGui::InputFloat("rotX", &selectedObject.rotation[0]);
-        ImGui::InputFloat("rotY", &selectedObject.rotation[1]);
-        ImGui::InputFloat("rotZ", &selectedObject.rotation[2]);
-
-        find_object_by_id(selectedObject.ID)->rotation[0] = selectedObject.rotation[0];
-        find_object_by_id(selectedObject.ID)->rotation[1] = selectedObject.rotation[1];
-        find_object_by_id(selectedObject.ID)->rotation[2] = selectedObject.rotation[2];
+            find_object_by_id(selectedObject.ID)->rotation[0] = selectedObject.rotation[0];
+            find_object_by_id(selectedObject.ID)->rotation[1] = selectedObject.rotation[1];
+            find_object_by_id(selectedObject.ID)->rotation[2] = selectedObject.rotation[2];
+        }
 
         ImGui::InputInt("Texture", &selectedObject.texture_id);
         if (selectedObject.texture_id >= 0 && selectedObject.texture_id < textures_count){

@@ -68,6 +68,9 @@ int main() {
     Wall myWall;
     myWall.init();
 
+    Enemy enemy;
+    enemy.init();
+
     Textures textures;
     //texture.set_path("/home/anton/Desktop/portfolio/texture_test/img/stone_tex.png");
 
@@ -100,38 +103,63 @@ int main() {
         for (int i = 0; i < ui_elements.get_objects().size(); i ++){
             textures.activate(ui_elements.get_objects()[i].texture_id);
 
-            collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(ui_elements.get_objects()[i].coords[0], 
-                ui_elements.get_objects()[i].coords[1], 
-                ui_elements.get_objects()[i].coords[2]));
-
-
-            float angleX = glm::radians(ui_elements.get_objects()[i].rotation[0]); // Rotate 30 degrees around X-axis
-            float angleY = glm::radians(ui_elements.get_objects()[i].rotation[1]); // Rotate 45 degrees around Y-axis
-            float angleZ = glm::radians(ui_elements.get_objects()[i].rotation[2]); // Rotate 60 degrees around Z-axis
-
-            glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis
-            glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), angleY, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis
-            glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), angleZ, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis
-            
-            glm::mat4 rotationMatrix = rotationZ * rotationY * rotationX; // Apply Z-Y-X rotation
-
-            model = model * rotationMatrix;     // Apply rotation
-
-
-            shader.upload_matrix(model, view, projection);
             if (ui_elements.get_objects()[i].type == "wall"){
+                collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(ui_elements.get_objects()[i].coords[0], 
+                    ui_elements.get_objects()[i].coords[1], 
+                    ui_elements.get_objects()[i].coords[2]));
+
+
+                float angleX = glm::radians(ui_elements.get_objects()[i].rotation[0]); // Rotate 30 degrees around X-axis
+                float angleY = glm::radians(ui_elements.get_objects()[i].rotation[1]); // Rotate 45 degrees around Y-axis
+                float angleZ = glm::radians(ui_elements.get_objects()[i].rotation[2]); // Rotate 60 degrees around Z-axis
+
+                glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis
+                glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), angleY, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis
+                glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), angleZ, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis
+                
+                glm::mat4 rotationMatrix = rotationZ * rotationY * rotationX; // Apply Z-Y-X rotation
+
+                model = model * rotationMatrix;     // Apply rotation
+
+                shader.upload_matrix(model, view, projection);
 
                 myWall.move_bounds(ui_elements.get_objects()[i].coords);
                 myWall.rotate_bounds(ui_elements.get_objects()[i].rotation);
                 
                 collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
                 collision.processInput(window, cameraSpeed/ui_elements.get_objects().size(), deltaTime, myWall.get_bounds(0), myWall.get_bounds(1));
-                if (myWall.isCameraLookingAt(collision.getCameraPos(), collision.getCameraFront()))
-                    std::cout << "yes" << std::endl;
-                else std::cout << "no" << std::endl;
+                //if (myWall.isCameraLookingAt(collision.getCameraPos(), collision.getCameraFront()))
+                //    std::cout << "yes" << std::endl;
+                //else std::cout << "no" << std::endl;
 
                 myWall.draw();
+            }
+            if (ui_elements.get_objects()[i].type == "enemy"){
+                glm::vec3 objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+
+                //Get camera position
+                glm::vec3 cameraPosition = collision.getCameraPos();
+
+                // Calculate direction vector
+                glm::vec3 directionToCamera = glm::normalize(cameraPosition - objectPosition);
+
+                // Calculate the "lookAt" matrix.
+                glm::mat4 rotation = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), directionToCamera, glm::vec3(0.0f, -1.0f, 0.0f));
+
+                // Apply the rotation to the object's model matrix
+                glm::mat4 model = glm::mat4(1.0f);  // Identity matrix
+                model = glm::translate(model, objectPosition);
+                model = model * rotation;;
+
+                shader.upload_matrix(model, view, projection);
+                collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
+                collision.processInput(window, cameraSpeed/ui_elements.get_objects().size(), deltaTime, enemy.get_bounds(0), enemy.get_bounds(1));
+                //if (myWall.isCameraLookingAt(collision.getCameraPos(), collision.getCameraFront()))
+                //    std::cout << "yes" << std::endl;
+                //else std::cout << "no" << std::endl;
+
+                enemy.draw();
             }
         }
         

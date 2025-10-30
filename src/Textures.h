@@ -8,8 +8,10 @@
 class Textures
 {
 private:
-    const char* pathes[2] = {"/home/anton/Desktop/portfolio/engine/img/tex.png", "/home/anton/Desktop/portfolio/engine/img/stone_tex.png"};
-    GLuint textures[2];
+    const char* pathes[3] = {"/home/anton/Desktop/portfolio/engine/img/tex.png", 
+        "/home/anton/Desktop/portfolio/engine/img/stone_tex.png", 
+        "/home/anton/Desktop/portfolio/engine/img/enemy.png"};
+    GLuint textures[3];
 public:
     Textures(/* args */);
     ~Textures();
