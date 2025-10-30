@@ -12,18 +12,11 @@
 #include "ShaderProgramm.h"
 #include "Basic_Objects.h"
 #include "UIElements.h"
+#include "Collision.h"
 
 // --- Глобальные настройки окна ---
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-// --- Переменные для камеры ---
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);   // Начальная позиция камеры
-float cameraSize = 0.5f; // Half the size for AABB
-glm::vec3 cameraMinBounds = cameraPos - glm::vec3(cameraSize);
-glm::vec3 cameraMaxBounds = cameraPos + glm::vec3(cameraSize);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);  // Вектор, куда смотрит камера (на -Z)
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);   // Вектор "вверх" для камеры
 
 float cameraSpeed = 2.5f; // Скорость движения камеры (единиц в секунду)
 float deltaTime = 0.0f;   // Время, прошедшее между текущим и предыдущим кадром
@@ -34,32 +27,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-// --- Функция для обработки пользовательского ввода ---
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    // Умножаем скорость на deltaTime, чтобы движение было равномерным независимо от FPS
-    float currentCameraSpeed = cameraSpeed * deltaTime;
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += currentCameraSpeed * cameraFront; // Вперед
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= currentCameraSpeed * cameraFront; // Назад
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        // Влево: вычисляем "правый" вектор (cross product) и движемся в противоположном направлении
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        // Вправо: вычисляем "правый" вектор и движемся в его направлении
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed;
-}
-
-bool checkCollision(const glm::vec3& minA, const glm::vec3& maxA,
-    const glm::vec3& minB, const glm::vec3& maxB) {
-    return (minA.x <= maxB.x && maxA.x >= minB.x) &&
-        (minA.y <= maxB.y && maxA.y >= minB.y) &&
-        (minA.z <= maxB.z && maxA.z >= minB.z);
-}
 
 // --- Основная функция ---
 int main() {
@@ -92,6 +59,8 @@ int main() {
     // Включаем тест глубины для корректного отображения 3D объектов
     glEnable(GL_DEPTH_TEST);
 
+    Collision collision;
+
     UIElements ui_elements;
     ui_elements.init(window);
 
@@ -116,9 +85,6 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Обработка пользовательского ввода (движение камеры)
-        processInput(window);
-
         // Очистка буферов цвета и глубины
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -128,50 +94,20 @@ int main() {
         ui_elements.list_update();
         ui_elements.prefs_update(sizeof(textures.get_textures()));
 
-
         // Создание матриц Model, View, Projection
 
-        glm::mat4 view = glm::lookAt(cameraPos,               // Позиция камеры
-                                     cameraPos + cameraFront, // Точка, на которую смотрит камера
-                                     cameraUp);               // Вектор "вверх"
-
+        glm::mat4 view = collision.set_view();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         for (int i = 0; i < ui_elements.get_objects().size(); i ++){
+            myCube.move_bounds(ui_elements.get_objects()[i].coords);
+
             
             textures.activate(ui_elements.get_objects()[i].texture_id);
 
-            glm::vec3 objectMinBounds(-0.5f, -0.5f, -0.5f);
-            glm::vec3 objectMaxBounds(0.5f, 0.5f, 0.5f);
-            if (checkCollision(cameraMinBounds, cameraMaxBounds, myCube.get_bounds(0), myCube.get_bounds(1))) {
-                // Calculate the center of the camera and the object
-                glm::vec3 cameraCenter = (cameraMinBounds + cameraMaxBounds) * 0.5f;
-                glm::vec3 objectCenter = (objectMinBounds + objectMaxBounds) * 0.5f;
 
-                // Calculate the distance vector from the object to the camera
-                glm::vec3 distance = cameraCenter - objectCenter;
+            collision.collide(myCube.get_bounds(0), myCube.get_bounds(1));
 
-                // Find the smallest axis of penetration
-                glm::vec3 absDistance = glm::abs(distance);
-                glm::vec3 penetration; // How much to push the camera out
-
-                if (absDistance.x < absDistance.y && absDistance.x < absDistance.z) {
-                    // Push the camera along the x-axis
-                    penetration.x = (cameraSize - absDistance.x) * (distance.x < 0 ? -1 : 1);
-                    cameraPos.x += penetration.x;
-                } else if (absDistance.y < absDistance.x && absDistance.y < absDistance.z) {
-                    // Push the camera along the y-axis
-                    penetration.y = (cameraSize - absDistance.y) * (distance.y < 0 ? -1 : 1);
-                    cameraPos.y += penetration.y;
-                } else {
-                    // Push the camera along the z-axis
-                    penetration.z = (cameraSize - absDistance.z) * (distance.z < 0 ? -1 : 1);
-                    cameraPos.z += penetration.z;
-                }
-            }
-
-    cameraMinBounds = cameraPos - glm::vec3(cameraSize);
-    cameraMaxBounds = cameraPos + glm::vec3(cameraSize);
 
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(ui_elements.get_objects()[i].coords[0], 
                 ui_elements.get_objects()[i].coords[1], 
@@ -192,8 +128,11 @@ int main() {
 
 
             shader.upload_matrix(model, view, projection);
-            if (ui_elements.get_objects()[i].type == "cube")
+            if (ui_elements.get_objects()[i].type == "cube"){
                 myCube.draw();
+                // Обработка пользовательского ввода (движение камеры)
+                collision.processInput(window, cameraSpeed/ui_elements.get_objects().size(), deltaTime, myCube.get_bounds(0), myCube.get_bounds(1));
+            }
             else if (ui_elements.get_objects()[i].type == "wall")
                 myWall.draw();
         }

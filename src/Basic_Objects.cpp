@@ -39,6 +39,8 @@ Cube::~Cube() {
 
 void Cube::init() {
     // Данные вершин для куба (позиции и текстурные координаты)
+    objectMinBounds = objectStartMinBounds;
+    objectMaxBounds = objectStartMaxBounds;
     float vertices[] = {
         // positions          // texture coords
         // Передняя грань
@@ -123,6 +125,15 @@ glm::vec3 Cube::get_bounds(int index){
         return objectMinBounds;
     if (index == 1)
         return objectMaxBounds;
+}
+
+void Cube::move_bounds(float coords[3]){
+    objectMinBounds.x = objectStartMinBounds[0] + coords[0]; 
+    objectMinBounds.y = objectStartMinBounds[1] + coords[1]; 
+    objectMinBounds.z = objectStartMinBounds[2] + coords[2]; 
+    objectMaxBounds.x = objectStartMaxBounds[0] + coords[0]; 
+    objectMaxBounds.y = objectStartMaxBounds[1] + coords[1]; 
+    objectMaxBounds.z = objectStartMaxBounds[2] + coords[2]; 
 }
 
 Wall::Wall() : Basic_Object() {

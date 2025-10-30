@@ -35,6 +35,7 @@ bool Collision::checkCollision(const glm::vec3& minB, const glm::vec3& maxB) {
 }
 
 glm::mat4 Collision::set_view(){
+    cameraPos.y = 0;
     return glm::lookAt(cameraPos,               // Позиция камеры
         cameraPos + cameraFront, // Точка, на которую смотрит камера
         cameraUp);               // Вектор "вверх"
@@ -42,12 +43,10 @@ glm::mat4 Collision::set_view(){
 }
 
 void Collision::collide(glm::vec3 cubeMinBounds, glm::vec3 cubeMaxBounds){
-    glm::vec3 objectMinBounds(-0.5f, -0.5f, -0.5f);
-        glm::vec3 objectMaxBounds(0.5f, 0.5f, 0.5f);
         if (checkCollision(cubeMinBounds, cubeMaxBounds)) {
             // Calculate the center of the camera and the object
             glm::vec3 cameraCenter = (cameraMinBounds + cameraMaxBounds) * 0.5f;
-            glm::vec3 objectCenter = (objectMinBounds + objectMaxBounds) * 0.5f;
+            glm::vec3 objectCenter = (cubeMinBounds + cubeMaxBounds) * 0.5f;
 
             // Calculate the distance vector from the object to the camera
             glm::vec3 distance = cameraCenter - objectCenter;

@@ -20,6 +20,8 @@ public:
 protected:
     GLuint VAO = 0;
     GLuint VBO = 0;
+    glm::vec3 objectMinBounds;
+    glm::vec3 objectMaxBounds;
 };
 
 // Удаляем объявление класса Cube отсюда, если оно было
@@ -34,9 +36,10 @@ public:
     // destroy() будет вызвана из деструктора Basic_Object,
     // и его реализация в Basic_Object достаточна
     glm::vec3 get_bounds(int index);
+    void move_bounds(float coords[3]);
 private:
-    glm::vec3 objectMinBounds = {-0.5f, -0.5f, -0.5f};
-    glm::vec3 objectMaxBounds = {0.5f, 0.5f, 0.5f};
+    glm::vec3 objectStartMinBounds = {-0.5f, -0.5f, -0.5f};
+    glm::vec3 objectStartMaxBounds = {0.5f, 0.5f, 0.5f};
 };
 
 class Wall : public Basic_Object {
