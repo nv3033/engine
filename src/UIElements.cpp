@@ -106,7 +106,7 @@ void UIElements::list_update(){
 
 static char nameBuffer[256] = ""; // Static buffer for name input
 
-void UIElements::prefs_update(){
+void UIElements::prefs_update(int textures_count){
     ImGui::Begin("Object Prefs");
     if (showPrefs){
         ImGui::Text("Current Object: %s", selectedObject.name.c_str());
@@ -146,6 +146,16 @@ void UIElements::prefs_update(){
         find_object_by_id(selectedObject.ID)->coords[0] = selectedObject.coords[0];
         find_object_by_id(selectedObject.ID)->coords[1] = selectedObject.coords[1];
         find_object_by_id(selectedObject.ID)->coords[2] = selectedObject.coords[2];
+
+        ImGui::InputInt("Texture", &selectedObject.texture_id);
+        if (selectedObject.texture_id >= 0 && selectedObject.texture_id < textures_count){
+            find_object_by_id(selectedObject.ID)->texture_id = selectedObject.texture_id;
+        }
+        else{
+            selectedObject.texture_id = 0;
+            find_object_by_id(selectedObject.ID)->texture_id = 0;
+        }
+
 
         ImGui::Separator();
 

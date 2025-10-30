@@ -12,9 +12,8 @@ add_executable(${PROJECT_NAME}
     src/Basic_Objects.cpp
     src/ShaderProgramm.h
     src/ShaderProgramm.cpp
-    src/HierarchyWindow.h
-    src/Window.h
-    src/Window.cpp
+    src/Textures.h
+    src/Textures.cpp
     src/UIElements.h
     src/UIElements.cpp
 )

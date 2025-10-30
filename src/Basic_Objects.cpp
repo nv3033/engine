@@ -1,66 +1,93 @@
 #include "Basic_Objects.h"
-
-void Basic_Object::destroy()
-{
-    if (VBO) glDeleteBuffers(1, &VBO);
-    if (VAO) glDeleteVertexArrays(1, &VAO);
-}
+// #include "Cube.h" // Больше не нужен, Cube теперь в своем файле
 
 Basic_Object::Basic_Object() : VAO(0), VBO(0) {}
 
+Basic_Object::~Basic_Object() {
+    destroy(); // Вызываем destroy при уничтожении базового объекта
+}
+
+void Basic_Object::destroy() {
+    if (VBO) {
+        glDeleteBuffers(1, &VBO);
+        VBO = 0;
+    }
+    if (VAO) {
+        glDeleteVertexArrays(1, &VAO);
+        VAO = 0;
+    }
+}
+
 void Basic_Object::init() {
+    // Базовая реализация может быть пустой
 }
 
 void Basic_Object::draw() const {
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
+    // Базовая реализация может быть пустой
 }
 
-void Cube::init(){
-    // 36 вершин: position (3) + color (3)
-    static const float vertices[] = {
-        -0.5f,-0.5f,-0.5f,   1.0f,0.0f,0.0f,
-         0.5f,-0.5f,-0.5f,   1.0f,0.0f,0.0f,
-         0.5f, 0.5f,-0.5f,   1.0f,0.0f,0.0f,
-         0.5f, 0.5f,-0.5f,   1.0f,0.0f,0.0f,
-        -0.5f, 0.5f,-0.5f,   1.0f,0.0f,0.0f,
-        -0.5f,-0.5f,-0.5f,   1.0f,0.0f,0.0f,
+// Удаляем Cube::init и Cube::destroy, если они были здесь
+// void Cube::init(){ ... }
+// void Cube::destroy(){ ... }
+Cube::Cube() : Basic_Object() {
+    // Конструктор базового класса уже инициализирует VAO/VBO в 0
+}
 
-        -0.5f,-0.5f, 0.5f,   0.0f,1.0f,0.0f,
-         0.5f,-0.5f, 0.5f,   0.0f,1.0f,0.0f,
-         0.5f, 0.5f, 0.5f,   0.0f,1.0f,0.0f,
-         0.5f, 0.5f, 0.5f,   0.0f,1.0f,0.0f,
-        -0.5f, 0.5f, 0.5f,   0.0f,1.0f,0.0f,
-        -0.5f,-0.5f, 0.5f,   0.0f,1.0f,0.0f,
+Cube::~Cube() {
+    // Деструктор базового класса вызовет destroy()
+}
 
-        -0.5f, 0.5f, 0.5f,   0.0f,0.0f,1.0f,
-        -0.5f, 0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f, 0.5f,   0.0f,0.0f,1.0f,
-        -0.5f, 0.5f, 0.5f,   0.0f,0.0f,1.0f,
+void Cube::init() {
+    // Данные вершин для куба (позиции и текстурные координаты)
+    float vertices[] = {
+        // positions          // texture coords
+        // Передняя грань
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-         0.5f, 0.5f, 0.5f,   1.0f,1.0f,0.0f,
-         0.5f, 0.5f,-0.5f,   1.0f,1.0f,0.0f,
-         0.5f,-0.5f,-0.5f,   1.0f,1.0f,0.0f,
-         0.5f,-0.5f,-0.5f,   1.0f,1.0f,0.0f,
-         0.5f,-0.5f, 0.5f,   1.0f,1.0f,0.0f,
-         0.5f, 0.5f, 0.5f,   1.0f,1.0f,0.0f,
+        // Задняя грань
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f,-0.5f,-0.5f,   1.0f,0.0f,1.0f,
-         0.5f,-0.5f,-0.5f,   1.0f,0.0f,1.0f,
-         0.5f,-0.5f, 0.5f,   1.0f,0.0f,1.0f,
-         0.5f,-0.5f, 0.5f,   1.0f,0.0f,1.0f,
-        -0.5f,-0.5f, 0.5f,   1.0f,0.0f,1.0f,
-        -0.5f,-0.5f,-0.5f,   1.0f,0.0f,1.0f,
+        // Левая грань
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-        -0.5f, 0.5f,-0.5f,   0.0f,1.0f,1.0f,
-         0.5f, 0.5f,-0.5f,   0.0f,1.0f,1.0f,
-         0.5f, 0.5f, 0.5f,   0.0f,1.0f,1.0f,
-         0.5f, 0.5f, 0.5f,   0.0f,1.0f,1.0f,
-        -0.5f, 0.5f, 0.5f,   0.0f,1.0f,1.0f,
-        -0.5f, 0.5f,-0.5f,   0.0f,1.0f,1.0f
+        // Правая грань
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        // Нижняя грань
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        // Верхняя грань
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     glGenVertexArrays(1, &VAO);
@@ -70,45 +97,23 @@ void Cube::init(){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    // Атрибут позиции (layout (location = 0))
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Атрибут текстурных координат (layout (location = 1))
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
-void Wall::init(){
-
-    // 36 вершин: position (3) + color (3)
-    static const float vertices[] = {
-        -0.5f, 0.5f, 0.5f,   0.0f,0.0f,1.0f,
-        -0.5f, 0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f,-0.5f,   0.0f,0.0f,1.0f,
-        -0.5f,-0.5f, 0.5f,   0.0f,0.0f,1.0f,
-        -0.5f, 0.5f, 0.5f,   0.0f,0.0f,1.0f
-    };
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
+void Cube::draw() const {
+    if (VAO == 0) {
+        std::cerr << "Error: Cube VAO is not initialized!" << std::endl;
+        return;
+    }
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
+    glDrawArrays(GL_TRIANGLES, 0, 36); // Куб состоит из 36 вершин
     glBindVertexArray(0);
-}
-
-Cube::~Cube(){
-    destroy();
-}
-
-Wall::~Wall(){
-    destroy();
 }
