@@ -72,7 +72,7 @@ void UIElements::list_update(){
             }
             newObject.ID = new_id;
             newObject.type = availableTypes[selectedType];
-            newObject.name = "cube_" + std::to_string(new_id);  // Simple name generation
+            newObject.name = "object_" + std::to_string(new_id);  // Simple name generation
 
             gameObjects.push_back(newObject);
             showAddObjectPopup = false;
@@ -139,13 +139,23 @@ void UIElements::prefs_update(int textures_count){
         }
 
 
-        ImGui::InputFloat("X", &selectedObject.coords[0]);
-        ImGui::InputFloat("Y", &selectedObject.coords[1]);
-        ImGui::InputFloat("Z", &selectedObject.coords[2]);
+        ImGui::InputFloat("posX", &selectedObject.coords[0]);
+        ImGui::InputFloat("posY", &selectedObject.coords[1]);
+        ImGui::InputFloat("posZ", &selectedObject.coords[2]);
 
         find_object_by_id(selectedObject.ID)->coords[0] = selectedObject.coords[0];
         find_object_by_id(selectedObject.ID)->coords[1] = selectedObject.coords[1];
         find_object_by_id(selectedObject.ID)->coords[2] = selectedObject.coords[2];
+
+        ImGui::Separator();
+
+        ImGui::InputFloat("rotX", &selectedObject.rotation[0]);
+        ImGui::InputFloat("rotY", &selectedObject.rotation[1]);
+        ImGui::InputFloat("rotZ", &selectedObject.rotation[2]);
+
+        find_object_by_id(selectedObject.ID)->rotation[0] = selectedObject.rotation[0];
+        find_object_by_id(selectedObject.ID)->rotation[1] = selectedObject.rotation[1];
+        find_object_by_id(selectedObject.ID)->rotation[2] = selectedObject.rotation[2];
 
         ImGui::InputInt("Texture", &selectedObject.texture_id);
         if (selectedObject.texture_id >= 0 && selectedObject.texture_id < textures_count){

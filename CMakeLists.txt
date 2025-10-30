@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME}
     src/Textures.cpp
     src/UIElements.h
     src/UIElements.cpp
+    src/Collision.h
+    src/Collision.cpp
 )
 
 set(GLM_DIR "${LIB_DIR}/glm")

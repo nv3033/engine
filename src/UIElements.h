@@ -14,6 +14,7 @@ struct GameObject {
     std::string type;
     std::string name;
     float coords[3] = {0, 0, 0};
+    float rotation[3] = {0, 0, 0};
     int texture_id = 0;
 };
 

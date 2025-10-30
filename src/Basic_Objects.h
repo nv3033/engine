@@ -2,6 +2,9 @@
 #define BASIC_OBJECTS_H
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 class Basic_Object {
@@ -25,6 +28,21 @@ class Cube : public Basic_Object {
 public:
     Cube();
     ~Cube() override; // Переопределение виртуального деструктора
+
+    void init() override;   // Переопределение метода инициализации
+    void draw() const override; // Переопределение метода отрисовки
+    // destroy() будет вызвана из деструктора Basic_Object,
+    // и его реализация в Basic_Object достаточна
+    glm::vec3 get_bounds(int index);
+private:
+    glm::vec3 objectMinBounds = {-0.5f, -0.5f, -0.5f};
+    glm::vec3 objectMaxBounds = {0.5f, 0.5f, 0.5f};
+};
+
+class Wall : public Basic_Object {
+public:
+    Wall();
+    ~Wall() override; // Переопределение виртуального деструктора
 
     void init() override;   // Переопределение метода инициализации
     void draw() const override; // Переопределение метода отрисовки

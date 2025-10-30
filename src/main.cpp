@@ -19,6 +19,9 @@ const unsigned int SCR_HEIGHT = 600;
 
 // --- Переменные для камеры ---
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);   // Начальная позиция камеры
+float cameraSize = 0.5f; // Half the size for AABB
+glm::vec3 cameraMinBounds = cameraPos - glm::vec3(cameraSize);
+glm::vec3 cameraMaxBounds = cameraPos + glm::vec3(cameraSize);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);  // Вектор, куда смотрит камера (на -Z)
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);   // Вектор "вверх" для камеры
 
@@ -49,6 +52,13 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         // Вправо: вычисляем "правый" вектор и движемся в его направлении
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed;
+}
+
+bool checkCollision(const glm::vec3& minA, const glm::vec3& maxA,
+    const glm::vec3& minB, const glm::vec3& maxB) {
+    return (minA.x <= maxB.x && maxA.x >= minB.x) &&
+        (minA.y <= maxB.y && maxA.y >= minB.y) &&
+        (minA.z <= maxB.z && maxA.z >= minB.z);
 }
 
 // --- Основная функция ---
@@ -88,6 +98,8 @@ int main() {
     // Создаем и инициализируем куб
     Cube myCube;
     myCube.init();
+    Wall myWall;
+    myWall.init();
 
     Textures textures;
     //texture.set_path("/home/anton/Desktop/portfolio/texture_test/img/stone_tex.png");
@@ -126,12 +138,64 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         for (int i = 0; i < ui_elements.get_objects().size(); i ++){
+            
             textures.activate(ui_elements.get_objects()[i].texture_id);
+
+            glm::vec3 objectMinBounds(-0.5f, -0.5f, -0.5f);
+            glm::vec3 objectMaxBounds(0.5f, 0.5f, 0.5f);
+            if (checkCollision(cameraMinBounds, cameraMaxBounds, myCube.get_bounds(0), myCube.get_bounds(1))) {
+                // Calculate the center of the camera and the object
+                glm::vec3 cameraCenter = (cameraMinBounds + cameraMaxBounds) * 0.5f;
+                glm::vec3 objectCenter = (objectMinBounds + objectMaxBounds) * 0.5f;
+
+                // Calculate the distance vector from the object to the camera
+                glm::vec3 distance = cameraCenter - objectCenter;
+
+                // Find the smallest axis of penetration
+                glm::vec3 absDistance = glm::abs(distance);
+                glm::vec3 penetration; // How much to push the camera out
+
+                if (absDistance.x < absDistance.y && absDistance.x < absDistance.z) {
+                    // Push the camera along the x-axis
+                    penetration.x = (cameraSize - absDistance.x) * (distance.x < 0 ? -1 : 1);
+                    cameraPos.x += penetration.x;
+                } else if (absDistance.y < absDistance.x && absDistance.y < absDistance.z) {
+                    // Push the camera along the y-axis
+                    penetration.y = (cameraSize - absDistance.y) * (distance.y < 0 ? -1 : 1);
+                    cameraPos.y += penetration.y;
+                } else {
+                    // Push the camera along the z-axis
+                    penetration.z = (cameraSize - absDistance.z) * (distance.z < 0 ? -1 : 1);
+                    cameraPos.z += penetration.z;
+                }
+            }
+
+    cameraMinBounds = cameraPos - glm::vec3(cameraSize);
+    cameraMaxBounds = cameraPos + glm::vec3(cameraSize);
+
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(ui_elements.get_objects()[i].coords[0], 
                 ui_elements.get_objects()[i].coords[1], 
                 ui_elements.get_objects()[i].coords[2]));
+
+
+            float angleX = glm::radians(ui_elements.get_objects()[i].rotation[0]); // Rotate 30 degrees around X-axis
+            float angleY = glm::radians(ui_elements.get_objects()[i].rotation[1]); // Rotate 45 degrees around Y-axis
+            float angleZ = glm::radians(ui_elements.get_objects()[i].rotation[2]); // Rotate 60 degrees around Z-axis
+
+            glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis
+            glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), angleY, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis
+            glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), angleZ, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis
+            
+            glm::mat4 rotationMatrix = rotationZ * rotationY * rotationX; // Apply Z-Y-X rotation
+
+            model = model * rotationMatrix;     // Apply rotation
+
+
             shader.upload_matrix(model, view, projection);
-            myCube.draw();
+            if (ui_elements.get_objects()[i].type == "cube")
+                myCube.draw();
+            else if (ui_elements.get_objects()[i].type == "wall")
+                myWall.draw();
         }
         
         ui_elements.update_end();
