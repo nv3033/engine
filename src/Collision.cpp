@@ -13,19 +13,38 @@ void Collision::processInput(GLFWwindow *window, float cameraSpeed, float deltaT
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    // Умножаем скорость на deltaTime, чтобы движение было равномерным независимо от FPS
     float currentCameraSpeed = cameraSpeed * deltaTime;
 
+    // Move camera
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += currentCameraSpeed * cameraFront; // Вперед
+        cameraPos += currentCameraSpeed * cameraFront; // Forward
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= currentCameraSpeed * cameraFront; // Назад
+        cameraPos -= currentCameraSpeed * cameraFront; // Backward
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        // Влево: вычисляем "правый" вектор (cross product) и движемся в противоположном направлении
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed;
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed; // Left
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        // Вправо: вычисляем "правый" вектор и движемся в его направлении
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed;
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * currentCameraSpeed; // Right
+
+    // Rotate camera
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        yaw -= 1.0f; // Rotate left
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        yaw += 1.0f; // Rotate right
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        pitch += 1.0f; // Rotate up
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        pitch -= 1.0f; // Rotate down
+
+    // Constrain pitch to avoid flipping
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
+
+    // Calculate the new camera front based on yaw and pitch
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
 }
 
 bool Collision::checkCollision(const glm::vec3& minB, const glm::vec3& maxB) {
@@ -72,4 +91,11 @@ void Collision::collide(glm::vec3 cubeMinBounds, glm::vec3 cubeMaxBounds){
 
     cameraMinBounds = cameraPos - glm::vec3(cameraSize);
     cameraMaxBounds = cameraPos + glm::vec3(cameraSize);
+}
+
+glm::vec3 Collision::getCameraPos(){
+    return cameraPos;
+}
+glm::vec3 Collision::getCameraFront(){
+    return cameraFront;
 }

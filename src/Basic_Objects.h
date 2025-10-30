@@ -37,9 +37,10 @@ public:
     // и его реализация в Basic_Object достаточна
     glm::vec3 get_bounds(int index);
     void move_bounds(float coords[3]);
+    void rotate_bounds(float coords[3]);
 private:
-    glm::vec3 objectStartMinBounds = {-0.5f, -0.5f, -0.5f};
-    glm::vec3 objectStartMaxBounds = {0.5f, 0.5f, 0.5f};
+    glm::vec3 objectStartMinBounds = {-0.5f, -0.5f, 0.0f};
+    glm::vec3 objectStartMaxBounds = {0.5f, 0.5f, 0.0f};
 };
 
 class Wall : public Basic_Object {
@@ -51,7 +52,30 @@ public:
     void draw() const override; // Переопределение метода отрисовки
     // destroy() будет вызвана из деструктора Basic_Object,
     // и его реализация в Basic_Object достаточна
+    glm::vec3 get_bounds(int index);
+    void move_bounds(float coords[3]);
+    void rotate_bounds(float coords[3]);
+    bool isCameraLookingAt(const glm::vec3& cameraPos, const glm::vec3& cameraFront);
+private:
+    glm::vec3 objectStartMinBounds = {-0.5, 0.0f, -0.5f};
+    glm::vec3 objectStartMaxBounds = {0.5, 0.0f, 0.5f};
 };
+
+/*class Enemy : Basic_Object
+{
+public:
+    Enemy();
+    ~Enemy(); 
+    void init() override;  
+    void draw() const override; 
+    glm::vec3 get_bounds(int index);
+    void move_bounds(float coords[3]);
+    void look_at(glm::vec3 cameraPos);
+private:
+    glm::vec3 objectStartMinBounds = {-0.5, 0.0f, -0.5f};
+    glm::vec3 objectStartMaxBounds = {0.5, 0.0f, 0.5f};
+};*/
+
 
 #endif // BASIC_OBJECTS_H
 

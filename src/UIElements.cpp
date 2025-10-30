@@ -1,6 +1,6 @@
 #include "UIElements.h"
 
-const char* availableTypes[] = { "cube", "wall" }; 
+const char* availableTypes[] = { "cube", "wall", "enemy"}; 
 char name_input_text[] = {};
 
 

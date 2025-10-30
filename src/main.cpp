@@ -64,9 +64,7 @@ int main() {
     UIElements ui_elements;
     ui_elements.init(window);
 
-    // Создаем и инициализируем куб
-    Cube myCube;
-    myCube.init();
+    
     Wall myWall;
     myWall.init();
 
@@ -100,15 +98,9 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         for (int i = 0; i < ui_elements.get_objects().size(); i ++){
-            myCube.move_bounds(ui_elements.get_objects()[i].coords);
-
-            
             textures.activate(ui_elements.get_objects()[i].texture_id);
 
-
-            collision.collide(myCube.get_bounds(0), myCube.get_bounds(1));
-
-
+            collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(ui_elements.get_objects()[i].coords[0], 
                 ui_elements.get_objects()[i].coords[1], 
                 ui_elements.get_objects()[i].coords[2]));
@@ -128,13 +120,19 @@ int main() {
 
 
             shader.upload_matrix(model, view, projection);
-            if (ui_elements.get_objects()[i].type == "cube"){
-                myCube.draw();
-                // Обработка пользовательского ввода (движение камеры)
-                collision.processInput(window, cameraSpeed/ui_elements.get_objects().size(), deltaTime, myCube.get_bounds(0), myCube.get_bounds(1));
-            }
-            else if (ui_elements.get_objects()[i].type == "wall")
+            if (ui_elements.get_objects()[i].type == "wall"){
+
+                myWall.move_bounds(ui_elements.get_objects()[i].coords);
+                myWall.rotate_bounds(ui_elements.get_objects()[i].rotation);
+                
+                collision.collide(myWall.get_bounds(0), myWall.get_bounds(1));
+                collision.processInput(window, cameraSpeed/ui_elements.get_objects().size(), deltaTime, myWall.get_bounds(0), myWall.get_bounds(1));
+                if (myWall.isCameraLookingAt(collision.getCameraPos(), collision.getCameraFront()))
+                    std::cout << "yes" << std::endl;
+                else std::cout << "no" << std::endl;
+
                 myWall.draw();
+            }
         }
         
         ui_elements.update_end();
@@ -143,7 +141,6 @@ int main() {
         glfwPollEvents();
     }
 
-    myCube.destroy();
     shader.~ShaderProgramm();
     textures.~Textures();
     ui_elements.~UIElements();
