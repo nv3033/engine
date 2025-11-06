@@ -27,12 +27,14 @@ private:
     bool showPrefs = false;
     int selectedType = 0;
 public:
+    const char* availableTypes[3] = { "cube", "wall", "enemy"}; 
     UIElements(/* args */);
     ~UIElements();
     void init(GLFWwindow* window);
     void update_start();
     void update_end();
-
+\
+    void top_bar_update(GLFWwindow* window);
     void prefs_update(int textures_count);
     void list_update();
 

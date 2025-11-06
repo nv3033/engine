@@ -48,7 +48,15 @@ const char* fragmentShaderSource = R"glsl(
 
     void main()
     {
-        FragColor = texture(uTexture, TexCoord);
+        // Переворот текстуры по оси Y
+        vec2 flippedTexCoord = vec2(TexCoord.x, 1.0 - TexCoord.y);
+
+        vec4 texColor = texture(uTexture, flippedTexCoord);
+
+        if (texColor.a < 0.1) {
+            discard; // Пропускаем пиксели с низкой прозрачностью
+        }
+        FragColor = texColor; // Используем цвет с альфа-каналом
     }
 )glsl";
 

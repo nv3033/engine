@@ -1,6 +1,5 @@
 #include "UIElements.h"
 
-const char* availableTypes[] = { "cube", "wall", "enemy"}; 
 char name_input_text[] = {};
 
 
@@ -34,6 +33,59 @@ void UIElements::update_start(){
 void UIElements::update_end(){
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void UIElements::top_bar_update(GLFWwindow* window){
+    if (ImGui::BeginMainMenuBar()) {
+    if (ImGui::BeginMenu("File")) {
+        // Пункт меню "New" (можно добавить, если нужно)
+        if (ImGui::MenuItem("New")) {
+            // Логика создания нового файла
+            std::cout << "New file clicked!" << std::endl;
+        }
+
+        // Пункт меню "Open" (можно добавить, если нужно)
+        if (ImGui::MenuItem("Open")) {
+            // Логика открытия файла
+            std::cout << "Open file clicked!" << std::endl;
+        }
+
+        // Пункт меню "Save"
+        if (ImGui::MenuItem("Save")) {
+            // Здесь будет вызов диалога сохранения файла
+            std::cout << "Save file clicked!" << std::endl;
+            // TODO: Реализовать вызов диалога сохранения
+        }
+
+        // Пункт меню "Save As..." (опционально)
+        if (ImGui::MenuItem("Save As...")) {
+            // Логика сохранения как...
+            std::cout << "Save As... clicked!" << std::endl;
+            // TODO: Реализовать вызов диалога сохранения
+        }
+
+        ImGui::Separator(); // Разделитель
+
+        // Пункт меню "Exit"
+        if (ImGui::MenuItem("Exit")) {
+            // Закрытие приложения
+            glfwSetWindowShouldClose(window, true); // Предполагаем, что 'window' доступен
+        }
+
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Game")) {
+        // Пункт меню "New" (можно добавить, если нужно)
+        if (ImGui::MenuItem("Play")) {
+            // Логика создания нового файла
+            std::cout << "New file clicked!" << std::endl;
+        }
+
+        ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+}
+
 }
 
 void UIElements::list_update(){
